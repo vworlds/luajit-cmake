@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.0)
 
-option(LUA_DIR "Path of Lua 5.4 source dir" OFF)
-option(LUAJIT_DIR "Path of LuaJIT 2.1 source dir" OFF)
+include(FetchContent)
+
+FetchContent_Declare(
+  luajitsrc
+  GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT.git
+  GIT_TAG v2.1
+)
+
+FetchContent_MakeAvailable(luajitsrc)
+
+set(LUAJIT_DIR ${luajitsrc_SOURCE_DIR})
 
 if(LUAJIT_DIR)
   project(luajit)
@@ -10,13 +19,6 @@ if(LUAJIT_DIR)
     set(LUA_TARGET luajit PARENT_SCOPE)
     set(LUA_LIBRARIES libluajit PARENT_SCOPE)
   endif()
-elseif(LUA_DIR)
-  project(lua)
-  include(lua.cmake)
-  if (PARENT_DIRECTORY)
-    set(LUA_TARGET lua PARENT_SCOPE)
-    set(LUA_LIBRARIES liblua PARENT_SCOPE)
-  endif()
 else()
-  message(FATAL_ERROR "Must set LUAJIT_DIR or LUA_DIR to build with CMake")
+  message(FATAL_ERROR "LUAJIT_DIR not set")
 endif()
