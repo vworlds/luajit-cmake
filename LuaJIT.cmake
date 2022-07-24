@@ -525,9 +525,11 @@ add_dependencies(libluajit
   buildvm
   lj_gen_headers
   lj_gen_folddef)
-target_include_directories(libluajit PRIVATE
+target_include_directories(libluajit PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR})
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${LJ_DIR})
+
 if(BUILD_SHARED_LIBS)
   if(WIN32 OR MINGW)
     set(LJ_DEFINITIONS ${LJ_DEFINITIONS}
@@ -595,4 +597,3 @@ if (LUAJIT_BUILD_EXE)
 
   install(TARGETS luajit DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endif()
-
