@@ -369,9 +369,9 @@ endif()
 set(VM_DASC_PATH ${LJ_DIR}/vm_${DASM_ARCH}.dasc)
 
 # Build the minilua for host platform
+set(MINILUA_PATH $<TARGET_FILE:minilua>)
 if(NOT CMAKE_CROSSCOMPILING)
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/host/minilua)
-  set(MINILUA_PATH $<TARGET_FILE:minilua>)
 else()
   make_directory(${CMAKE_CURRENT_BINARY_DIR}/minilua)
 
@@ -387,11 +387,28 @@ else()
   )
 endif()
 
+# Generate luajit.h
+set(GIT_FORMAT %ct)
+if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+  set(GIT_FORMAT %%ct)
+endif()
+add_custom_command(OUTPUT ${LUAJIT_DIR}/src/luajit_relver.txt
+  COMMAND git show -s --format=${GIT_FORMAT} > ${LUAJIT_DIR}/src/luajit_relver.txt
+  WORKING_DIRECTORY ${LUAJIT_DIR}
+)
+
+add_custom_command(OUTPUT ${LUAJIT_DIR}/src/luajit.h
+  COMMAND ${HOST_WINE} ${MINILUA_PATH} host/genversion.lua
+  WORKING_DIRECTORY ${LUAJIT_DIR}/src
+  DEPENDS ${LUAJIT_DIR}/src/luajit_rolling.h
+  DEPENDS ${LUAJIT_DIR}/src/luajit_relver.txt
+)
+
 # Generate buildvm_arch.h
 add_custom_command(OUTPUT ${BUILDVM_ARCH_H}
   COMMAND ${HOST_WINE} ${MINILUA_PATH} ${DASM_PATH} ${DASM_FLAGS}
           -o ${BUILDVM_ARCH_H} ${VM_DASC_PATH}
-  DEPENDS minilua)
+  DEPENDS minilua ${LUAJIT_DIR}/src/luajit.h)
 add_custom_target(buildvm_arch_h ALL
   DEPENDS ${BUILDVM_ARCH_H}
 )
