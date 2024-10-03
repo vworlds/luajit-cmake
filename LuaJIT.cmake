@@ -19,20 +19,20 @@ if (NOT WIN32)
 endif ()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum version of macOS/iOS)")
-set(LUAJIT_BUILD_EXE ON CACHE BOOL "Enable luajit exe build")
+set(LUAJIT_BUILD_EXE OFF CACHE BOOL "Enable luajit exe build")
 set(LUAJIT_BUILD_ALAMG OFF CACHE BOOL "Enable alamg build mode")
 set(LUAJIT_DISABLE_GC64 OFF CACHE BOOL "Disable GC64 mode for x64")
 set(LUA_MULTILIB "lib" CACHE PATH "The name of lib directory.")
 set(LUAJIT_DISABLE_FFI OFF CACHE BOOL "Permanently disable the FFI extension")
 set(LUAJIT_DISABLE_JIT OFF CACHE BOOL "Disable the JIT compiler")
 set(LUAJIT_NO_UNWIND OFF CACHE BOOL "Disable the UNWIND")
+set(LUAJIT_ENABLE_LUA52COMPAT ON CACHE BOOL "Enable LuaJIT2.1 compat with Lua5.2")
 set(LUAJIT_NUMMODE 0 CACHE STRING
 "Specify the number mode to use. Possible values:
   0 - Default mode
   1 - Single number mode
   2 - Dual number mode
 ")
-
 message(STATUS "${CMAKE_CROSSCOMPILING} ${CMAKE_HOST_SYSTEM_NAME}")
 message(STATUS "${CMAKE_SIZEOF_VOID_P} ${CMAKE_SYSTEM_NAME}")
 if(CMAKE_CROSSCOMPILING)
@@ -582,6 +582,8 @@ endif()
 if(IOS AND ("${LJ_TARGET_ARCH}" STREQUAL "arm64"))
   set(LJ_COMPILE_OPTIONS ${LJ_COMPILE_OPTIONS} -fno-omit-frame-pointer)
 endif()
+
+set(LJ_COMPILE_OPTIONS ${LJ_COMPILE_OPTIONS} -msse4.2 )
 
 target_compile_options(libluajit PRIVATE ${LJ_COMPILE_OPTIONS})
 

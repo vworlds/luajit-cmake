@@ -4,8 +4,8 @@ include(FetchContent)
 
 FetchContent_Declare(
   luajitsrc
-  GIT_REPOSITORY https://github.com/LuaJIT/LuaJIT.git
-  GIT_TAG v2.1
+  GIT_REPOSITORY https://github.com/openresty/luajit2
+  GIT_TAG v2.1-20240815
 )
 
 FetchContent_MakeAvailable(luajitsrc)
