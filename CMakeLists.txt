@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.27)
 include(FetchContent)
 
 # Provide default values, but allow overriding via the parent project
-set(LUAJIT_GIT_REPOSITORY "https://github.com/openresty/luajit2" CACHE STRING "LuaJIT Git repository")
-set(LUAJIT_GIT_TAG "v2.1-20240815" CACHE STRING "LuaJIT Git tag")
+set(LUAJIT_GIT_REPOSITORY "https://github.com/openresty/luajit2")
+set(LUAJIT_GIT_TAG "v2.1-20240815")
 
 FetchContent_Declare(
   luajitsrc
