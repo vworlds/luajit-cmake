@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.27)
 
 project(luajit)
 set(can_use_assembler TRUE)
@@ -168,27 +168,33 @@ if(WIN32 OR MINGW)
   set(DASM_FLAGS ${DASM_FLAGS} -D WIN)
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/Modules/FindUnwind.cmake)
-if (NOT unwind_FOUND)
-  set(LUAJIT_NO_UNWIND ON)
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL mips64 OR
-     CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64 OR
-     CMAKE_SYSTEM_NAME STREQUAL Windows)
-    if(NOT IOS)
-      set(LUAJIT_NO_UNWIND IGNORE)
-    endif()
-  endif()
-endif()
+
+# JPR 2024-10-03 Disable FindUnwind so it does not alter LUAJIT_NO_UNWIND
+# we want it off so that below LUAJIT_UNWIND_EXTERNAL is set and we can have
+# the stack work properly.
+
+#include(${CMAKE_CURRENT_LIST_DIR}/Modules/FindUnwind.cmake)
+#if (NOT unwind_FOUND)
+#  set(LUAJIT_NO_UNWIND ON)
+#  if(CMAKE_SYSTEM_PROCESSOR STREQUAL mips64 OR
+#     CMAKE_SYSTEM_PROCESSOR STREQUAL aarch64 OR
+#     CMAKE_SYSTEM_NAME STREQUAL Windows)
+#    if(NOT IOS)
+#      set(LUAJIT_NO_UNWIND IGNORE)
+#    endif()
+#  endif()
+#endif()
 
 message(STATUS "#### CMAKE_SYSTEM_NAME is ${CMAKE_SYSTEM_NAME}")
 message(STATUS "#### CMAKE_SYSTEM_PROCESSOR is ${CMAKE_SYSTEM_PROCESSOR}")
-message(STATUS "#### ARCH is ${ARCH}")
+message(STATUS "#### LJ_TARGET_ARCH is ${LJ_TARGET_ARCH}")
 message(STATUS "#### unwind_FOUND is ${unwind_FOUND}")
 message(STATUS "#### HAVE_UNWIND_H is ${HAVE_UNWIND_H}")
 message(STATUS "#### HAVE_UNWIND_LIB is ${HAVE_UNWIND_LIB}")
 message(STATUS "#### UNWIND_LIBRARY is ${UNWIND_LIBRARY}")
 
 message(STATUS "#### LUAJIT_NO_UNWIND is ${LUAJIT_NO_UNWIND}")
+
 
 set(LJ_DEFINITIONS "")
 if(LUAJIT_NO_UNWIND STREQUAL ON)
@@ -198,6 +204,7 @@ if(LUAJIT_NO_UNWIND STREQUAL ON)
   set(LJ_DEFINITIONS ${LJ_DEFINITIONS} -DLUAJIT_NO_UNWIND)
 elseif(${LUAJIT_NO_UNWIND} STREQUAL OFF)
   # LUAJIT_NO_UNWIND is OFF
+  message(STATUS "#### LUAJIT_NO_UNWIND is OFF")
   set(LJ_DEFINITIONS ${LJ_DEFINITIONS} -DLUAJIT_UNWIND_EXTERNAL)
   set(TARGET_ARCH ${TARGET_ARCH} -DLUAJIT_UNWIND_EXTERNAL)
 endif()
