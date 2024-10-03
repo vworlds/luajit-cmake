@@ -5,25 +5,23 @@ in an existing CMake project.
 
 This repository does not contain LuaJIT, but it manages downloading it from the configured repo and tag.
 
-This is a fork from [https://git.sr.ht/~lasse/luajit-cmake](https://git.sr.ht/~lasse/luajit-cmake) and modified slightly to make it work for our project, which means it is not guaranteed to work for anything other than x64 architecture.
+This is a fork from [Janbuller/luajit-cmake](https://github.com/Janbuller/luajit-cmake) and tuned to make sure `LUAJIT_UNWIND_EXTERNAL` is set for Linux.
 
-## Changes made:
+I've tried to backport as much as possible from [zhaozg](https://github.com/zhaozg/luajit-cmake)'s original version and recent improvements.
 
-### In LuaJIT.cmake:
-
-- Removed Unwind library detection code, because we want to force `LUAJIT_UNWIND_EXTERNAL` so stack is not messed up in C++
-- Added Lua 5.2 compatibility flag
+Additionally, I have made it easy to select from the parent project what fork of LuaJIT and version is compiled.
 
 ## How to use:
 
 Include the following in your `CMakeLists.txt` file:
 
 ```cmake
-# Set the LuaJIT repository and tag to be used by the luajit-cmake project
+# Set the LuaJIT repository and tag to compiled by luajit-cmake
 set(LUAJIT_GIT_REPOSITORY "https://github.com/openresty/luajit2")
 set(LUAJIT_GIT_TAG "v2.1-20240815")
 
 # Include the luajit-cmake project with the custom repository and tag
+# luajit-cmake will download and compile the above fork of LuaJIT
 FetchContent_Declare(
     luajitcmake
     GIT_REPOSITORY https://github.com/vworlds/luajit-cmake.git
@@ -31,6 +29,9 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(luajitcmake)
+
+# Link the LuaJIT library
+target_link_libraries(${YOUR_PROJECT} PUBLIC libluajit)
 ```
 
 (Replace `master` with the desired tag in this repo. Alternatively, just fork the repo and manage your own tags)
@@ -46,4 +47,4 @@ set(LUAJIT_GIT_TAG "v2.1.ROLLING")
 
 Forked from [https://git.sr.ht/~lasse/luajit-cmake](https://git.sr.ht/~lasse/luajit-cmake), which in turn was forked from
 [https://github.com/zhaozg/luajit-cmake](https://github.com/zhaozg/luajit-cmake),
-with significant portions removed as they are not needed for lasse's purposes.
+with significant portions removed as they were not needed for lasse's purposes.
