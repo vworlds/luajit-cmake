@@ -590,6 +590,7 @@ if(IOS AND ("${LJ_TARGET_ARCH}" STREQUAL "arm64"))
   set(LJ_COMPILE_OPTIONS ${LJ_COMPILE_OPTIONS} -fno-omit-frame-pointer)
 endif()
 
+# JPR: Add -msse4.2 so we can compile OpenResty's version of LuaJIT.
 set(LJ_COMPILE_OPTIONS ${LJ_COMPILE_OPTIONS} -msse4.2 )
 
 target_compile_options(libluajit PRIVATE ${LJ_COMPILE_OPTIONS})
